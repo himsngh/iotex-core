@@ -265,6 +265,7 @@ func getChainConfig(hu config.HeightUpgrade, height uint64) *params.ChainConfig 
 	chainConfig.BeringBlock = new(big.Int).SetUint64(hu.BeringBlockHeight())
 	// enable earlier Ethereum forks at Greenland
 	chainConfig.GreenlandBlock = new(big.Int).SetUint64(hu.GreenlandBlockHeight())
+	chainConfig.HawaiiBlock = new(big.Int).SetUint64(hu.HawaiiBlockHeight())
 	return &chainConfig
 }
 

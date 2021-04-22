@@ -75,6 +75,7 @@ func TestConstantinople(t *testing.T) {
 	defer ctrl.Finish()
 	sm := mock_chainmanager.NewMockStateManager(ctrl)
 
+	config.SetEVMNetworkID(config.Default.Chain.EVMNetworkID)
 	ctx := protocol.WithActionCtx(context.Background(), protocol.ActionCtx{
 		Caller: identityset.Address(27),
 	})
@@ -196,6 +197,7 @@ func TestConstantinople(t *testing.T) {
 		require.Equal(big.NewInt(int64(genesis.Default.BeringBlockHeight)), evmChainConfig.BeringBlock)
 		require.Equal(big.NewInt(int64(genesis.Default.GreenlandBlockHeight)), evmChainConfig.GreenlandBlock)
 		require.Equal(hu.IsPre(config.Bering, e.height), evm.IsPreBering())
+		require.Equal(hu.IsPost(config.Hawaii, e.height), evmChainConfig.IsHawaii(new(big.Int).SetUint64(e.height)))
 
 		// support chainID starting hawaii
 		if hu.IsPost(config.Hawaii, e.height) {
