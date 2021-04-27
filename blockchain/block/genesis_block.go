@@ -12,7 +12,7 @@ import (
 
 	"github.com/iotexproject/go-pkgs/hash"
 
-	"github.com/iotexproject/iotex-core/config"
+	"github.com/iotexproject/iotex-core/blockchain/genesis"
 	"github.com/iotexproject/iotex-core/pkg/version"
 )
 
@@ -27,7 +27,7 @@ func GenesisBlock() *Block {
 		Header: Header{
 			version:          version.ProtocolVersion,
 			height:           0,
-			timestamp:        time.Unix(config.GenesisTimestamp(), 0),
+			timestamp:        time.Unix(genesis.GenesisTimestamp(), 0),
 			prevBlockHash:    hash.ZeroHash256,
 			txRoot:           hash.ZeroHash256,
 			deltaStateDigest: hash.ZeroHash256,

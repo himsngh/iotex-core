@@ -54,6 +54,9 @@ func main() {
 	if err != nil {
 		glog.Fatalln("Failed to new genesis config.", zap.Error(err))
 	}
+	if genesis.GenesisTimestamp() == 0 {
+		glog.Fatalln("Genesis timestamp is not set, call genesis.New() first")
+	}
 
 	cfg, err := config.New()
 	if err != nil {
@@ -65,9 +68,6 @@ func main() {
 
 	if config.EVMNetworkID() == 0 {
 		glog.Fatalln("EVM Network ID is not set, call config.New() first")
-	}
-	if config.GenesisTimestamp() == 0 {
-		glog.Fatalln("Genesis timestamp is not set, call config.New() first")
 	}
 	block.LoadGenesisHash()
 	if block.GenesisHash() == hash.ZeroHash256 {

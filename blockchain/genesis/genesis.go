@@ -10,6 +10,8 @@ import (
 	"flag"
 	"math/big"
 	"sort"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -29,7 +31,11 @@ import (
 // Default contains the default genesis config
 var Default = defaultConfig()
 
-var genesisPath string
+var (
+	genesisPath   string
+	genesisTs     int64
+	loadGenesisTs sync.Once
+)
 
 func init() {
 	flag.StringVar(&genesisPath, "genesis-path", "", "Genesis path")
@@ -170,7 +176,13 @@ type (
 		FairbankBlockHeight uint64 `yaml:"fairbankHeight"`
 		// GreenlandBlockHeight is the start height of storing latest 720 block meta and rewarding/staking bucket pool
 		GreenlandBlockHeight uint64 `yaml:"greenlandHeight"`
-		// HawaiiBlockHeight is the start height to fix GetBlockHash in EVM
+		// HawaiiBlockHeight is the start height to
+		// 1. fix GetBlockHash in EVM
+		// 2. display revert message in EVM
+		// 3. fix sorted map in evm state adaptor
+		// 4. fix change to same candidate in staking
+		// 5. correct contract creation address in EVM
+		// 6. support chainID in EVM
 		HawaiiBlockHeight uint64 `yaml:"hawaiiHeight"`
 	}
 	// Account contains the configs for account protocol
@@ -304,7 +316,22 @@ func New() (Genesis, error) {
 	if err := yaml.Get(config.Root).Populate(&genesis); err != nil {
 		return Genesis{}, errors.Wrap(err, "failed to unmarshal yaml genesis to struct")
 	}
+
+	// set genesis timestamp
+	SetGenesisTimestamp(genesis.Timestamp)
 	return genesis, nil
+}
+
+// SetGenesisTimestamp sets the genesis timestamp
+func SetGenesisTimestamp(ts int64) {
+	loadGenesisTs.Do(func() {
+		genesisTs = ts
+	})
+}
+
+// GenesisTimestamp returns the genesis timestamp
+func GenesisTimestamp() int64 {
+	return atomic.LoadInt64(&genesisTs)
 }
 
 // Hash is the hash of genesis config
